@@ -43,6 +43,8 @@ public readonly record struct FixedPointVector(params FixedPointNumber[] Values)
     
     public FixedPointNumber Dot(FixedPointVector other) => Values.Zip(other.Values).Aggregate(FixedPointNumber.Zero, (result, x) => result + (x.First * x.Second));
     
+    public FixedPointNumber Wedge(FixedPointVector other) => Values.Zip(other.Values).Aggregate(FixedPointNumber.Zero, (result, x) => result + (x.First * x.Second));
+    
     public static FixedPointVector operator +(FixedPointVector a, FixedPointVector b) => a.Add(b);
 
     public static FixedPointVector operator *(FixedPointVector a, FixedPointVector b) => a.Multiply(b);
