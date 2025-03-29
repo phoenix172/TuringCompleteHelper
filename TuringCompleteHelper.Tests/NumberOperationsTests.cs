@@ -10,6 +10,8 @@ public class NumberOperationsTests
     [TestCase("5*5", "25")]
     [TestCase("#fe8b8156 * #ffdaa260", "#365e8964")] // Wedge product - tick 17
     [TestCase("#ffb38c91 * #d9a18f", "#bf01e79c")] // Wedge product - tick 17
+    [TestCase("#00000000 * #fffc0000", "0")] // missing test in Fixed point multiply
+    [TestCase("#01A1EB33 * #FFC5F805", "#A143AF42")] // missing test in Fixed point multiply
     public Task Multiply(string expression, string expectedResult) => Verify(expression, expectedResult);
     
     [TestCase("5/5", "1")]

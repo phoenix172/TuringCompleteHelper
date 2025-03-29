@@ -34,7 +34,7 @@ public readonly record struct FixedPointNumber
         short roundingByte = (short)(multiply & (short)-1);
         var multiplyShifted = multiply >> 16;
         int increment = multiply < 0 ? 1 : -1;
-        if ((roundingByte < -1 && multiply < 0) || (roundingByte != 0 && roundingByte > -1 && multiply > 0)) 
+        if ((roundingByte <= -1 && multiply < 0) || (roundingByte != 0 && roundingByte > -1 && multiply > 0)) 
             multiplyShifted += increment;
         string hex = Convert.ToString(Clamp(multiplyShifted), 16).PadLeft(8, '0');
         return new(hex[^8..]);
