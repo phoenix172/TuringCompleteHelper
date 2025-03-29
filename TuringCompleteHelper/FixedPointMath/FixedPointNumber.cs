@@ -16,8 +16,8 @@ public readonly record struct FixedPointNumber
 
     public FixedPointNumber(double value)
     {
-        Value = value;
-        Hex = FixedPointNumberConverter.ConvertDoubleStringToQ16_16(Value.ToString("00000.00000000000"));
+        Hex = FixedPointNumberConverter.ConvertDoubleStringToQ16_16(value.ToString("00000.00000000000"));
+        Value = double.Parse(FixedPointNumberConverter.ConvertQ16_16ToDoubleString(Hex));
         SignedValue = int.Parse($"{Hex}", NumberStyles.HexNumber);
     }
 
@@ -27,9 +27,26 @@ public readonly record struct FixedPointNumber
 
     private int SignedValue { get; }
 
-    public FixedPointNumber Multiply(FixedPointNumber other) => new(Clamp(Value * other.Value));
+    public FixedPointNumber Multiply(FixedPointNumber other)
+    {
+        var multiply = ((long)int.Parse(Hex, NumberStyles.HexNumber) *
+                        (long)int.Parse(other.Hex, NumberStyles.HexNumber));
+        short roundingByte = (short)(multiply & (short)-1);
+        var multiplyShifted = multiply >> 16;
+        int increment = multiply < 0 ? 1 : -1;
+        if ((roundingByte < -1 && multiply < 0) || (roundingByte != 0 && roundingByte > -1 && multiply > 0)) 
+            multiplyShifted += increment;
+        string hex = Convert.ToString(Clamp(multiplyShifted), 16).PadLeft(8, '0');
+        return new(hex[^8..]);
+    }
 
-    public FixedPointNumber Divide(FixedPointNumber divisor) => new(Clamp(Value / divisor.Value));
+    public FixedPointNumber Divide(FixedPointNumber divisor)
+    {
+        var divide = ((long)int.Parse(Hex, NumberStyles.HexNumber) << 16) /
+                        int.Parse(divisor.Hex, NumberStyles.HexNumber);
+        string hex = Convert.ToString(Clamp(divide), 16).PadLeft(8, '0');
+        return new(hex[^8..]);
+    }
 
     public FixedPointNumber Add(FixedPointNumber other) => new(Clamp(Value + other.Value));
 
@@ -86,4 +103,5 @@ public readonly record struct FixedPointNumber
 
     public static FixedPointNumber operator /(FixedPointNumber a, FixedPointNumber b) => a.Divide(b);
     public static double Clamp(double value) => Math.Min(Math.Max(value, MinValue.Value), MaxValue.Value);
+    public static long Clamp(long value) => Math.Min(Math.Max(value, MinValue.SignedValue), MaxValue.SignedValue);
 }
