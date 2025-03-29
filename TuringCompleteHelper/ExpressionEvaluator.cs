@@ -27,9 +27,9 @@ public class ExpressionEvaluator
     private static string ProcessTokens(List<string> tokens)
     {
         Regex hexRegex = new Regex("^#[0-9A-Fa-f]+$");
-        Regex decimalRegex = new Regex("^[0-9]+(.[0-9]+)?$");
+        Regex decimalRegex = new Regex("^-?[0-9]+(.[0-9]+)?$");
         Regex vectorRegex =
-            new Regex($"^\\[({hexRegex.ToString().Trim('$', '^')}|{decimalRegex.ToString().Trim('$', '^')}|,)+\\]$");
+            new Regex($@"^((\[({hexRegex.ToString().Trim('$', '^')}|{decimalRegex.ToString().Trim('$', '^')}|,|\s)+\])|,)+$");
 
         var replacedNumericLiterals = tokens.Select(token =>
         {
@@ -63,13 +63,14 @@ public class ExpressionEvaluator
     private static List<string> Tokenize(string expression)
     {
         expression = expression.Replace(" ", "");
-        var operators = new[] { '+', '*', 'x', '/', '(', ')' }.ToImmutableHashSet();
+        var operators = new[] { '+', '*', '/', '(', ')' }.ToImmutableHashSet();
         List<string> tokens = new();
         StringBuilder termBuilder = new StringBuilder();
         foreach (var c in expression.Index())
         {
-            if (operators.Contains(c.Item) || (c.Item == '.' && !char.IsDigit(expression[c.Index + 1]) &&
-                                               expression[c.Index + 1] != '#'))
+            if (operators.Contains(c.Item) 
+                || (c.Item == '.' && !char.IsDigit(expression[c.Index + 1]) && expression[c.Index + 1] != '#')
+                || (c.Item == '-' && c.Index > 0 && expression[c.Index - 1] != '(' && expression[c.Index - 1] != '['))
             {
                 tokens.Add(termBuilder.ToString());
                 tokens.Add(c.Item.ToString());
