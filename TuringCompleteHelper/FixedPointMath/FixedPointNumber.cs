@@ -10,18 +10,18 @@ public readonly record struct FixedPointNumber
     public static readonly FixedPointNumber Zero = new(0);
 
     public FixedPointNumber(string hexValue)
-        : this(double.Parse(FixedPointNumberConverter.ConvertQ16_16ToDoubleString(hexValue)))
+        : this(decimal.Parse(FixedPointNumberConverter.ConvertQ16_16ToDoubleString(hexValue)))
     {
     }
 
-    public FixedPointNumber(double value)
+    public FixedPointNumber(decimal value)
     {
-        Hex = FixedPointNumberConverter.ConvertDoubleStringToQ16_16(value.ToString("00000.000000000000"));
-        Value = double.Parse(FixedPointNumberConverter.ConvertQ16_16ToDoubleString(Hex));
+        Hex = FixedPointNumberConverter.ConvertDoubleStringToQ16_16(value.ToString("00000.00000000000"));
+        Value = decimal.Parse(FixedPointNumberConverter.ConvertQ16_16ToDoubleString(Hex));
         SignedValue = int.Parse($"{Hex}", NumberStyles.HexNumber);
     }
 
-    public double Value { get; }
+    public decimal Value { get; }
 
     public string Hex { get; }
 
@@ -90,7 +90,7 @@ public readonly record struct FixedPointNumber
     {
         if (value.FirstOrDefault() == '#')
             return new FixedPointNumber(value[1..]);
-        return new FixedPointNumber(double.Parse(value));
+        return new FixedPointNumber(decimal.Parse(value));
     }
 
     public static FixedPointNumber operator +(FixedPointNumber a, FixedPointNumber b) => a.Add(b);
@@ -102,6 +102,6 @@ public readonly record struct FixedPointNumber
     public static FixedPointNumber operator *(FixedPointNumber a, FixedPointNumber b) => a.Multiply(b);
 
     public static FixedPointNumber operator /(FixedPointNumber a, FixedPointNumber b) => a.Divide(b);
-    public static double Clamp(double value) => Math.Min(Math.Max(value, MinValue.Value), MaxValue.Value);
+    public static decimal Clamp(decimal value) => Math.Min(Math.Max(value, MinValue.Value), MaxValue.Value);
     public static long Clamp(long value) => Math.Min(Math.Max(value, MinValue.SignedValue), MaxValue.SignedValue);
 }
