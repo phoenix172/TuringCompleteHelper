@@ -8,7 +8,9 @@ public class TestHelper
     {
         ExpressionEvaluator evaluator = new();
         var result = await evaluator.Evaluate(expression);
-        if(result is FixedPointVector vectorResult && FixedPointVector.TryParse(expectedResult, out var expectedVectorResult))
+        if(result is string)
+            Assert.That(result, Is.EqualTo(expectedResult));
+        else if(result is FixedPointVector vectorResult && FixedPointVector.TryParse(expectedResult, out var expectedVectorResult))
             Assert.That(vectorResult.Values, Is.EqualTo(expectedVectorResult.Values).AsCollection);
         else
             Assert.That(result, Is.EqualTo(FixedPointNumber.Parse(expectedResult)));

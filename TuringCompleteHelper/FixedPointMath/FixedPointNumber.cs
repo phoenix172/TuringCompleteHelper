@@ -16,7 +16,7 @@ public readonly record struct FixedPointNumber
 
     public FixedPointNumber(double value)
     {
-        Hex = FixedPointNumberConverter.ConvertDoubleStringToQ16_16(value.ToString("00000.00000000000"));
+        Hex = FixedPointNumberConverter.ConvertDoubleStringToQ16_16(value.ToString("00000.000000000000"));
         Value = double.Parse(FixedPointNumberConverter.ConvertQ16_16ToDoubleString(Hex));
         SignedValue = int.Parse($"{Hex}", NumberStyles.HexNumber);
     }
